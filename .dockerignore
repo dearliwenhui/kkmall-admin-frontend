@@ -1,21 +1,56 @@
+# Dependencies
 node_modules
-.DS_Store
+
+# Build output (will be generated during Docker build)
 dist
 dist-ssr
-*.local
-.eslintcache
-report.html
 
-yarn.lock
+# Logs
 npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
 .pnpm-error.log*
-.pnpm-debug.log
-tests/**/coverage/
+lerna-debug.log*
+
+# OS files
+.DS_Store
+*.local
 
 # Editor directories and files
+.vscode/*
+!.vscode/extensions.json
 .idea
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
+*.sw?
+
+# Testing
+coverage
+tests/**/coverage/
+.eslintcache
+
+# Misc
+report.html
 tsconfig.tsbuildinfo
+*.tsbuildinfo
+
+# Git
+.git
+.gitignore
+.gitattributes
+
+# CI/CD
+.github
+
+# Documentation
+*.md
+!README.md
+
+# Docker
+Dockerfile
+.dockerignore
+
+# Note: Keep 'build' directory - it contains Vite build configuration files
