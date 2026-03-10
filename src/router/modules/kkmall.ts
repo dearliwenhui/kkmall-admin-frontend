@@ -66,7 +66,43 @@ export default {
       component: () => import("@/views/kkmall/user/index.vue"),
       meta: {
         title: "用户管理",
-        icon: "ep:user"
+        icon: "ep:user",
+        auths: [
+          "user:manage",
+          "user:add",
+          "user:edit",
+          "user:delete"
+        ]
+      }
+    },
+    {
+      path: "/kkmall/role",
+      name: "Role",
+      component: () => import("@/views/kkmall/role/index.vue"),
+      meta: {
+        title: "角色管理",
+        icon: "ep:avatar",
+        auths: [
+          "role:manage",
+          "role:add",
+          "role:edit",
+          "role:delete"
+        ]
+      }
+    },
+    {
+      path: "/kkmall/permission",
+      name: "Permission",
+      component: () => import("@/views/kkmall/permission/index.vue"),
+      meta: {
+        title: "权限管理",
+        icon: "ep:key",
+        auths: [
+          "permission:manage",
+          "permission:add",
+          "permission:edit",
+          "permission:delete"
+        ]
       }
     }
   ]

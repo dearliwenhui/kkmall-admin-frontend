@@ -1,38 +1,76 @@
 import { http } from "@/utils/http";
 
+interface ApiResult<T> {
+  code: number;
+  message: string;
+  data: T;
+}
+
+const unwrap = <T>(promise: Promise<ApiResult<T>>): Promise<T> => {
+  return promise.then(res => res.data);
+};
+
 /**
- * 用户查询参数
+ * User query params.
  */
 export interface UserQueryParams {
   pageNum?: number;
   pageSize?: number;
   username?: string;
-  phone?: string;
-  email?: string;
+  nickname?: string;
   status?: number;
 }
 
 /**
- * 用户信息
+ * User create data.
  */
-export interface User {
-  id?: number;
+export interface UserCreateData {
   username: string;
-  phone?: string;
+  password: string;
+  nickname: string;
   email?: string;
-  avatar?: string;
-  nickname?: string;
-  gender?: number;
-  birthday?: string;
+  phone?: string;
   status: number;
-  registerIp?: string;
-  lastLoginTime?: string;
-  createTime?: string;
-  updateTime?: string;
+  roleIds?: number[];
 }
 
 /**
- * 分页响应
+ * User update data.
+ */
+export interface UserUpdateData {
+  nickname: string;
+  email?: string;
+  phone?: string;
+  status: number;
+  roleIds?: number[];
+}
+
+/**
+ * Role info.
+ */
+export interface RoleInfo {
+  id: number;
+  roleName: string;
+  roleCode: string;
+}
+
+/**
+ * User info.
+ */
+export interface UserInfo {
+  id: number;
+  username: string;
+  nickname: string;
+  email?: string;
+  phone?: string;
+  status: number;
+  createTime: string;
+  updateTime: string;
+  roles: RoleInfo[];
+}
+
+/**
+ * Pagination payload.
  */
 export interface PageResult<T> {
   records: T[];
@@ -42,56 +80,108 @@ export interface PageResult<T> {
 }
 
 /**
- * 获取用户列表
+ * Fetch user list.
  */
 export const getUserList = (params: UserQueryParams) => {
-  return http.request<PageResult<User>>("get", "/api/users", {
-    params
-  });
+  return unwrap(
+    http.request<ApiResult<PageResult<UserInfo>>>("get", "/api/users", {
+      params
+    })
+  );
 };
 
 /**
- * 获取用户详情
+ * Fetch user detail.
  */
 export const getUserDetail = (id: number) => {
-  return http.request<User>("get", `/api/users/${id}`);
+  return unwrap(
+    http.request<ApiResult<UserInfo>>("get", `/api/users/${id}`)
+  );
 };
 
 /**
- * 创建用户
+ * Create user.
  */
-export const createUser = (data: User) => {
-  return http.request<User>("post", "/api/users", { data });
+export const createUser = (data: UserCreateData) => {
+  return unwrap(
+    http.request<ApiResult<UserInfo>>("post", "/api/users", { data })
+  );
 };
 
 /**
- * 更新用户
+ * Update user.
  */
-export const updateUser = (id: number, data: Partial<User>) => {
-  return http.request<User>("put", `/api/users/${id}`, { data });
+export const updateUser = (id: number, data: UserUpdateData) => {
+  return unwrap(
+    http.request<ApiResult<UserInfo>>("put", `/api/users/${id}`, { data })
+  );
 };
 
 /**
- * 删除用户
+ * Delete user.
  */
 export const deleteUser = (id: number) => {
-  return http.request<void>("delete", `/api/users/${id}`);
+  return http
+    .request<ApiResult<void>>("delete", `/api/users/${id}`)
+    .then(() => undefined);
 };
 
 /**
- * 启用/禁用用户
+ * Batch delete users.
  */
-export const updateUserStatus = (id: number, status: number) => {
-  return http.request<void>("put", `/api/users/${id}/status`, {
-    data: { status }
-  });
+export const batchDeleteUsers = (ids: number[]) => {
+  return http
+    .request<ApiResult<void>>("post", "/api/users/batch-delete", {
+      data: { ids }
+    })
+    .then(() => undefined);
 };
 
 /**
- * 重置用户密码
+ * Enable user.
  */
-export const resetUserPassword = (id: number, newPassword: string) => {
-  return http.request<void>("put", `/api/users/${id}/password`, {
-    data: { password: newPassword }
-  });
+export const enableUser = (id: number) => {
+  return http
+    .request<ApiResult<void>>("put", `/api/users/${id}/enable`)
+    .then(() => undefined);
+};
+
+/**
+ * Disable user.
+ */
+export const disableUser = (id: number) => {
+  return http
+    .request<ApiResult<void>>("put", `/api/users/${id}/disable`)
+    .then(() => undefined);
+};
+
+/**
+ * Reset user password.
+ */
+export const resetPassword = (id: number, newPassword: string) => {
+  return http
+    .request<ApiResult<void>>("put", `/api/users/${id}/reset-password`, {
+      data: { newPassword }
+    })
+    .then(() => undefined);
+};
+
+/**
+ * Assign roles to user.
+ */
+export const assignRoles = (id: number, roleIds: number[]) => {
+  return http
+    .request<ApiResult<void>>("put", `/api/users/${id}/roles`, {
+      data: { roleIds }
+    })
+    .then(() => undefined);
+};
+
+/**
+ * Get all roles for selection.
+ */
+export const getAllRoles = () => {
+  return unwrap(
+    http.request<ApiResult<RoleInfo[]>>("get", "/api/roles")
+  );
 };
