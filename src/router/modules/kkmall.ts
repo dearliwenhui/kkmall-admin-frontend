@@ -41,6 +41,22 @@ export default {
       }
     },
     {
+      path: "/kkmall/category",
+      name: "Category",
+      component: () => import("@/views/kkmall/category/index.vue"),
+      meta: {
+        title: "分类管理",
+        icon: "ep:menu",
+        showParent: true,
+        auths: [
+          "category:manage",
+          "category:add",
+          "category:edit",
+          "category:delete"
+        ]
+      }
+    },
+    {
       path: "/kkmall/order",
       name: "Order",
       component: () => import("@/views/kkmall/order/index.vue"),

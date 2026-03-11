@@ -1,4 +1,5 @@
 export * as productApi from "./product";
+export * as categoryApi from "./category";
 export * as orderApi from "./order";
 export * as userApi from "./user";
 export { roleApi } from "./role";

@@ -182,6 +182,6 @@ export const assignRoles = (id: number, roleIds: number[]) => {
  */
 export const getAllRoles = () => {
   return unwrap(
-    http.request<ApiResult<RoleInfo[]>>("get", "/api/roles")
+    http.request<ApiResult<RoleInfo[]>>("get", "/api/roles/all")
   );
 };

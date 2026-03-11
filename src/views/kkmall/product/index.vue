@@ -4,8 +4,9 @@ import { ElMessage, ElMessageBox } from "element-plus";
 import type { FormInstance, FormRules, UploadRequestOptions } from "element-plus";
 import "@wangeditor/editor/dist/css/style.css";
 import { Editor, Toolbar } from "@wangeditor/editor-for-vue";
-import { commonApi, productApi } from "@/api/kkmall";
+import { categoryApi, commonApi, productApi } from "@/api/kkmall";
 import type { Product, ProductQueryParams } from "@/api/kkmall/product";
+import type { CategoryTreeNode } from "@/api/kkmall/category";
 
 defineOptions({
   name: "Product"
@@ -34,6 +35,7 @@ const tableData = ref<Product[]>([]);
 const total = ref(0);
 const loading = ref(false);
 const selectedRows = ref<Product[]>([]);
+const categoryTreeNodes = ref<CategoryTreeNode[]>([]);
 
 const dialogVisible = ref(false);
 const dialogLoading = ref(false);
@@ -59,7 +61,7 @@ editorConfig.MENU_CONF = {
 const rules: FormRules = {
   productName: [{ required: true, message: "请输入商品名称", trigger: "blur" }],
   productCode: [{ required: true, message: "请输入商品编码", trigger: "blur" }],
-  categoryId: [{ required: true, message: "请输入分类ID", trigger: "change" }],
+  categoryId: [{ required: true, message: "请选择商品分类", trigger: "change" }],
   price: [{ required: true, message: "请输入商品价格", trigger: "change" }],
   stock: [{ required: true, message: "请输入库存", trigger: "change" }],
   status: [{ required: true, message: "请选择商品状态", trigger: "change" }]
@@ -70,6 +72,14 @@ const formatStatus = (status: number) => (status === 1 ? "上架" : "下架");
 
 const resetFormData = () => {
   Object.assign(productForm, defaultForm());
+};
+
+const loadCategoryTreeNodes = async () => {
+  try {
+    categoryTreeNodes.value = await categoryApi.getCategoryTreeNodes();
+  } catch (error: any) {
+    ElMessage.error(error?.message || "加载分类树失败");
+  }
 };
 
 const handleEditorCreated = (editor: any) => {
@@ -144,6 +154,7 @@ const openCreateDialog = () => {
   isEdit.value = false;
   resetFormData();
   dialogVisible.value = true;
+  loadCategoryTreeNodes();
 };
 
 const openEditDialog = (row: Product) => {
@@ -160,6 +171,7 @@ const openEditDialog = (row: Product) => {
     images: [...(row.images || [])]
   });
   dialogVisible.value = true;
+  loadCategoryTreeNodes();
 };
 
 const handleDialogClose = () => {
@@ -367,8 +379,22 @@ onBeforeUnmount(() => {
         <el-form-item label="商品编码" prop="productCode">
           <el-input v-model="productForm.productCode" maxlength="64" show-word-limit />
         </el-form-item>
-        <el-form-item label="分类ID" prop="categoryId">
-          <el-input-number v-model="productForm.categoryId" :min="1" :precision="0" />
+        <el-form-item label="商品分类" prop="categoryId">
+          <el-cascader
+            v-model="productForm.categoryId"
+            :options="categoryTreeNodes"
+            :props="{
+              value: 'value',
+              label: 'label',
+              children: 'children',
+              checkStrictly: true,
+              emitPath: false
+            }"
+            placeholder="请选择商品分类"
+            clearable
+            filterable
+            style="width: 100%"
+          />
         </el-form-item>
         <el-form-item label="价格" prop="price">
           <el-input-number
