@@ -326,7 +326,7 @@ export default defineFakeRoute([
     method: "get",
     response: () => {
       return {
-        code: 0,
+        code: 200,
         message: "操作成功",
         data: [
           systemManagementRouter,
