@@ -1,8 +1,15 @@
 import { http } from "@/utils/http";
 
-/**
- * 订单查询参数
- */
+interface ApiResult<T> {
+  code: number;
+  message: string;
+  data: T;
+}
+
+const unwrap = <T>(promise: Promise<ApiResult<T>>): Promise<T> => {
+  return promise.then(res => res.data);
+};
+
 export interface OrderQueryParams {
   pageNum?: number;
   pageSize?: number;
@@ -13,47 +20,53 @@ export interface OrderQueryParams {
   keyword?: string;
 }
 
-/**
- * 订单项
- */
 export interface OrderItem {
   id?: number;
   productId: number;
   productName: string;
-  productCode: string;
-  productImage: string;
+  productImage?: string;
   price: number;
   quantity: number;
-  totalPrice: number;
+  totalAmount: number;
 }
 
-/**
- * 订单信息
- */
 export interface Order {
   id?: number;
   orderNo: string;
   userId: number;
   username?: string;
+  nickname?: string;
   totalAmount: number;
-  payAmount: number;
+  payAmount?: number;
   status: number;
-  paymentMethod?: string;
-  paymentTime?: string;
-  deliveryTime?: string;
-  finishTime?: string;
+  statusText?: string;
   receiverName: string;
   receiverPhone: string;
   receiverAddress: string;
+  logisticsCompany?: string;
+  trackingNumber?: string;
   remark?: string;
+  itemCount?: number;
   items?: OrderItem[];
+  payTime?: string;
+  shipTime?: string;
+  confirmTime?: string;
   createTime?: string;
   updateTime?: string;
 }
 
-/**
- * 分页响应
- */
+export interface OrderStatistics {
+  totalOrders: number;
+  pendingPaymentOrders: number;
+  pendingShipmentOrders: number;
+  pendingReceiptOrders: number;
+  completedOrders: number;
+  cancelledOrders: number;
+  todayOrders: number;
+  totalSales: number;
+  todaySales: number;
+}
+
 export interface PageResult<T> {
   records: T[];
   total: number;
@@ -61,58 +74,47 @@ export interface PageResult<T> {
   pageSize: number;
 }
 
-/**
- * 获取订单列表
- */
 export const getOrderList = (params: OrderQueryParams) => {
-  return http.request<PageResult<Order>>("get", "/api/orders", {
-    params
-  });
+  return unwrap(
+    http.request<ApiResult<PageResult<Order>>>("get", "/api/orders", {
+      params
+    })
+  );
 };
 
-/**
- * 获取订单详情
- */
 export const getOrderDetail = (id: number) => {
-  return http.request<Order>("get", `/api/orders/${id}`);
+  return unwrap(http.request<ApiResult<Order>>("get", `/api/orders/${id}`));
 };
 
-/**
- * 获取订单详情（通过订单号）
- */
 export const getOrderByNo = (orderNo: string) => {
-  return http.request<Order>("get", `/api/orders/no/${orderNo}`);
+  return unwrap(
+    http.request<ApiResult<Order>>("get", `/api/orders/no/${orderNo}`)
+  );
 };
 
-/**
- * 发货
- */
 export const deliverOrder = (
   id: number,
   data: { expressCompany: string; expressNo: string }
 ) => {
-  return http.request<void>("put", `/api/orders/${id}/deliver`, { data });
+  return http
+    .request<ApiResult<void>>("put", `/api/orders/${id}/deliver`, { data })
+    .then(() => undefined);
 };
 
-/**
- * 取消订单
- */
 export const cancelOrder = (id: number, reason?: string) => {
-  return http.request<void>("put", `/api/orders/${id}/cancel`, {
-    data: { reason }
-  });
+  return http
+    .request<ApiResult<void>>("put", `/api/orders/${id}/cancel`, {
+      data: { reason }
+    })
+    .then(() => undefined);
 };
 
-/**
- * 完成订单
- */
 export const completeOrder = (id: number) => {
-  return http.request<void>("put", `/api/orders/${id}/complete`);
+  return http
+    .request<ApiResult<void>>("put", `/api/orders/${id}/complete`)
+    .then(() => undefined);
 };
 
-/**
- * 导出订单
- */
 export const exportOrders = (params: OrderQueryParams) => {
   return http.request<Blob>("get", "/api/orders/export", {
     params,
@@ -120,12 +122,13 @@ export const exportOrders = (params: OrderQueryParams) => {
   });
 };
 
-/**
- * 获取订单统计
- */
 export const getOrderStatistics = (params?: {
   startTime?: string;
   endTime?: string;
 }) => {
-  return http.request<any>("get", "/api/orders/statistics", { params });
+  return unwrap(
+    http.request<ApiResult<OrderStatistics>>("get", "/api/orders/statistics", {
+      params
+    })
+  );
 };

@@ -41,6 +41,12 @@ export type RefreshTokenResult = {
   };
 };
 
+export type RefreshTokenApiResult = {
+  code: number;
+  message: string;
+  data: string;
+};
+
 export type UserInfo = {
   /** 头像 */
   avatar: string;
@@ -84,7 +90,7 @@ export const getLogin = (data?: object) => {
 
 /** 刷新`token` */
 export const refreshTokenApi = () => {
-  return http.request<RefreshTokenResult>("post", "/api/auth/refresh", {});
+  return http.request<RefreshTokenApiResult>("post", "/api/auth/refresh", {});
 };
 
 /** 获取当前用户信息 */
