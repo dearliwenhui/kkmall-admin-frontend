@@ -27,9 +27,9 @@ export default ({ mode }: ConfigEnv): UserConfigExport => {
       // 本地跨域代理 https://cn.vitejs.dev/config/server-options.html#server-proxy
       proxy: {
         "/api": {
-          target: "http://localhost:38080",
-          changeOrigin: true
-          // 不移除 /api 前缀，因为后端 API 路径包含 /api
+          target: "http://localhost:38079",  // 代理到网关端口而不是直接到后端
+          changeOrigin: true,
+          rewrite: (path) => path.replace(/^\/api/, '')
         }
       },
       // 预热文件以提前转换和缓存结果，降低启动期间的初始页面加载时长并防止转换瀑布

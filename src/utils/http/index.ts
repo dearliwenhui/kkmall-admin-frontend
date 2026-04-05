@@ -17,6 +17,9 @@ import { useUserStoreHook } from "@/store/modules/user";
 
 const defaultConfig: AxiosRequestConfig = {
   timeout: 10000,
+  baseURL: import.meta.env.VITE_BASE_URL
+    ? import.meta.env.VITE_BASE_URL.replace(/\/+$/, "")
+    : undefined,
   headers: {
     Accept: "application/json, text/plain, */*",
     "Content-Type": "application/json",
