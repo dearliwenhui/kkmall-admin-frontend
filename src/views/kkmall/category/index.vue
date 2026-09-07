@@ -3,7 +3,11 @@ import { onMounted, reactive, ref } from "vue";
 import { ElMessage, ElMessageBox } from "element-plus";
 import type { FormInstance, FormRules } from "element-plus";
 import { categoryApi } from "@/api/kkmall";
-import type { Category, CategoryQueryParams, CategoryTreeNode } from "@/api/kkmall/category";
+import type {
+  Category,
+  CategoryQueryParams,
+  CategoryTreeNode
+} from "@/api/kkmall/category";
 
 defineOptions({
   name: "Category"
@@ -115,7 +119,10 @@ const handleParentChange = (value: number) => {
   if (value === 0) {
     categoryForm.level = 1;
   } else {
-    const findLevel = (nodes: CategoryTreeNode[], targetValue: number): number | null => {
+    const findLevel = (
+      nodes: CategoryTreeNode[],
+      targetValue: number
+    ): number | null => {
       for (const node of nodes) {
         if (node.value === targetValue) {
           return node.level;
@@ -180,11 +187,15 @@ const handleBatchDelete = () => {
     ElMessage.warning("请选择要删除的分类");
     return;
   }
-  ElMessageBox.confirm(`确定要删除选中的 ${selectedRows.value.length} 个分类吗？`, "提示", {
-    confirmButtonText: "确定",
-    cancelButtonText: "取消",
-    type: "warning"
-  })
+  ElMessageBox.confirm(
+    `确定要删除选中的 ${selectedRows.value.length} 个分类吗？`,
+    "提示",
+    {
+      confirmButtonText: "确定",
+      cancelButtonText: "取消",
+      type: "warning"
+    }
+  )
     .then(async () => {
       try {
         const ids = selectedRows.value.map(row => row.id!);
@@ -218,7 +229,12 @@ onMounted(() => {
           />
         </el-form-item>
         <el-form-item label="层级">
-          <el-select v-model="queryForm.level" placeholder="请选择层级" clearable>
+          <el-select
+            v-model="queryForm.level"
+            placeholder="请选择层级"
+            clearable
+            style="width: 120px"
+          >
             <el-option label="一级" :value="1" />
             <el-option label="二级" :value="2" />
             <el-option label="三级" :value="3" />
@@ -267,8 +283,12 @@ onMounted(() => {
         <el-table-column prop="createTime" label="创建时间" width="180" />
         <el-table-column label="操作" width="150" fixed="right">
           <template #default="{ row }">
-            <el-button link type="primary" @click="handleEdit(row)">编辑</el-button>
-            <el-button link type="danger" @click="handleDelete(row)">删除</el-button>
+            <el-button link type="primary" @click="handleEdit(row)"
+              >编辑</el-button
+            >
+            <el-button link type="danger" @click="handleDelete(row)"
+              >删除</el-button
+            >
           </template>
         </el-table-column>
       </el-table>
@@ -279,7 +299,7 @@ onMounted(() => {
         :total="total"
         :page-sizes="[10, 20, 50, 100]"
         layout="total, sizes, prev, pager, next, jumper"
-        style="margin-top: 16px; justify-content: flex-end"
+        style="justify-content: flex-end; margin-top: 16px"
         @current-change="handlePageChange"
         @size-change="handleSizeChange"
       />
@@ -293,10 +313,10 @@ onMounted(() => {
     >
       <el-form
         ref="formRef"
+        v-loading="dialogLoading"
         :model="categoryForm"
         :rules="rules"
         label-width="100px"
-        v-loading="dialogLoading"
       >
         <el-form-item label="分类名称" prop="name">
           <el-input v-model="categoryForm.name" placeholder="请输入分类名称" />
@@ -304,8 +324,17 @@ onMounted(() => {
         <el-form-item label="父分类" prop="parentId">
           <el-cascader
             v-model="categoryForm.parentId"
-            :options="[{ value: 0, label: '顶级分类', level: 0 }, ...categoryTreeNodes]"
-            :props="{ value: 'value', label: 'label', children: 'children', checkStrictly: true, emitPath: false }"
+            :options="[
+              { value: 0, label: '顶级分类', level: 0 },
+              ...categoryTreeNodes
+            ]"
+            :props="{
+              value: 'value',
+              label: 'label',
+              children: 'children',
+              checkStrictly: true,
+              emitPath: false
+            }"
             placeholder="请选择父分类"
             clearable
             style="width: 100%"
@@ -334,7 +363,11 @@ onMounted(() => {
       </el-form>
       <template #footer>
         <el-button @click="dialogVisible = false">取消</el-button>
-        <el-button type="primary" @click="handleSubmit" :loading="dialogLoading">
+        <el-button
+          type="primary"
+          :loading="dialogLoading"
+          @click="handleSubmit"
+        >
           确定
         </el-button>
       </template>

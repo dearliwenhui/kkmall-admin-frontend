@@ -1,7 +1,11 @@
 <script setup lang="ts">
 import { onBeforeUnmount, onMounted, reactive, ref, shallowRef } from "vue";
 import { ElMessage, ElMessageBox } from "element-plus";
-import type { FormInstance, FormRules, UploadRequestOptions } from "element-plus";
+import type {
+  FormInstance,
+  FormRules,
+  UploadRequestOptions
+} from "element-plus";
 import "@wangeditor/editor/dist/css/style.css";
 import { Editor, Toolbar } from "@wangeditor/editor-for-vue";
 import { categoryApi, commonApi, productApi } from "@/api/kkmall";
@@ -51,7 +55,10 @@ const editorConfig: any = { placeholder: "请输入商品图文详情..." };
 
 editorConfig.MENU_CONF = {
   uploadImage: {
-    async customUpload(file: File, insertFn: (url: string, alt?: string, href?: string) => void) {
+    async customUpload(
+      file: File,
+      insertFn: (url: string, alt?: string, href?: string) => void
+    ) {
       const res = await commonApi.uploadFile(file, "product-richtext");
       insertFn(res.url, file.name, res.url);
     }
@@ -61,7 +68,9 @@ editorConfig.MENU_CONF = {
 const rules: FormRules = {
   productName: [{ required: true, message: "请输入商品名称", trigger: "blur" }],
   productCode: [{ required: true, message: "请输入商品编码", trigger: "blur" }],
-  categoryId: [{ required: true, message: "请选择商品分类", trigger: "change" }],
+  categoryId: [
+    { required: true, message: "请选择商品分类", trigger: "change" }
+  ],
   price: [{ required: true, message: "请输入商品价格", trigger: "change" }],
   stock: [{ required: true, message: "请输入库存", trigger: "change" }],
   status: [{ required: true, message: "请选择商品状态", trigger: "change" }]
@@ -218,7 +227,9 @@ const handleBatchDelete = () => {
     ElMessage.warning("请至少选择一条商品记录");
     return;
   }
-  const ids = selectedRows.value.map(item => item.id).filter(Boolean) as number[];
+  const ids = selectedRows.value
+    .map(item => item.id)
+    .filter(Boolean) as number[];
   if (ids.length === 0) return;
 
   ElMessageBox.confirm(`确认删除已选中的 ${ids.length} 个商品吗？`, "提示", {
@@ -271,7 +282,12 @@ onBeforeUnmount(() => {
           />
         </el-form-item>
         <el-form-item label="状态">
-          <el-select v-model="queryForm.status" placeholder="全部" clearable>
+          <el-select
+            v-model="queryForm.status"
+            placeholder="全部"
+            clearable
+            style="width: 120px"
+          >
             <el-option label="上架" :value="1" />
             <el-option label="下架" :value="0" />
           </el-select>
@@ -286,8 +302,12 @@ onBeforeUnmount(() => {
     <el-card shadow="never" class="mt-4">
       <template #header>
         <div class="table-header">
-          <el-button type="primary" @click="openCreateDialog">新增商品</el-button>
-          <el-button type="danger" plain @click="handleBatchDelete">批量删除</el-button>
+          <el-button type="primary" @click="openCreateDialog"
+            >新增商品</el-button
+          >
+          <el-button type="danger" plain @click="handleBatchDelete"
+            >批量删除</el-button
+          >
         </div>
       </template>
 
@@ -336,7 +356,12 @@ onBeforeUnmount(() => {
             >
               详情
             </el-button>
-            <el-button type="primary" size="small" link @click="openEditDialog(row)">
+            <el-button
+              type="primary"
+              size="small"
+              link
+              @click="openEditDialog(row)"
+            >
               编辑
             </el-button>
             <el-button
@@ -347,7 +372,12 @@ onBeforeUnmount(() => {
             >
               {{ row.status === 1 ? "下架" : "上架" }}
             </el-button>
-            <el-button type="danger" size="small" link @click="handleDelete(row)">
+            <el-button
+              type="danger"
+              size="small"
+              link
+              @click="handleDelete(row)"
+            >
               删除
             </el-button>
           </template>
@@ -372,12 +402,25 @@ onBeforeUnmount(() => {
       width="860px"
       @closed="handleDialogClose"
     >
-      <el-form ref="formRef" :model="productForm" :rules="rules" label-width="120px">
+      <el-form
+        ref="formRef"
+        :model="productForm"
+        :rules="rules"
+        label-width="120px"
+      >
         <el-form-item label="商品名称" prop="productName">
-          <el-input v-model="productForm.productName" maxlength="100" show-word-limit />
+          <el-input
+            v-model="productForm.productName"
+            maxlength="100"
+            show-word-limit
+          />
         </el-form-item>
         <el-form-item label="商品编码" prop="productCode">
-          <el-input v-model="productForm.productCode" maxlength="64" show-word-limit />
+          <el-input
+            v-model="productForm.productCode"
+            maxlength="64"
+            show-word-limit
+          />
         </el-form-item>
         <el-form-item label="商品分类" prop="categoryId">
           <el-cascader
@@ -424,17 +467,28 @@ onBeforeUnmount(() => {
             :http-request="uploadImageRequest"
             accept=".jpg,.jpeg,.png,.webp"
           >
-            <el-button type="primary" plain :loading="uploadLoading">上传图片</el-button>
+            <el-button type="primary" plain :loading="uploadLoading"
+              >上传图片</el-button
+            >
           </el-upload>
 
-          <div v-if="productForm.images && productForm.images.length > 0" class="image-list">
-            <div v-for="(img, index) in productForm.images" :key="`${img}-${index}`" class="image-item">
-                <el-image :src="img" fit="cover" class="image-preview" />
-                <div class="image-actions">
-                  <el-text truncated>{{ img }}</el-text>
-                  <el-button type="danger" link @click="removeImageUrl(index)">移除</el-button>
-                </div>
+          <div
+            v-if="productForm.images && productForm.images.length > 0"
+            class="image-list"
+          >
+            <div
+              v-for="(img, index) in productForm.images"
+              :key="`${img}-${index}`"
+              class="image-item"
+            >
+              <el-image :src="img" fit="cover" class="image-preview" />
+              <div class="image-actions">
+                <el-text truncated>{{ img }}</el-text>
+                <el-button type="danger" link @click="removeImageUrl(index)"
+                  >移除</el-button
+                >
               </div>
+            </div>
           </div>
         </el-form-item>
         <el-form-item label="图文详情" prop="description">
@@ -477,47 +531,47 @@ onBeforeUnmount(() => {
 
 .table-header {
   display: flex;
-  align-items: center;
   gap: 8px;
+  align-items: center;
 }
 
 .image-list {
-  margin-top: 12px;
   display: flex;
   flex-direction: column;
   gap: 8px;
   width: 100%;
+  margin-top: 12px;
 }
 
 .image-item {
   display: flex;
-  align-items: center;
   gap: 10px;
+  align-items: center;
+  padding: 8px;
   border: 1px solid var(--el-border-color-lighter);
   border-radius: 6px;
-  padding: 8px;
 }
 
 .image-preview {
+  flex-shrink: 0;
   width: 56px;
   height: 56px;
   border-radius: 4px;
-  flex-shrink: 0;
 }
 
 .image-actions {
-  min-width: 0;
   display: flex;
-  justify-content: space-between;
-  align-items: center;
   flex: 1;
   gap: 8px;
+  align-items: center;
+  justify-content: space-between;
+  min-width: 0;
 }
 
 .wangeditor {
   width: 100%;
+  overflow: hidden;
   border: 1px solid var(--el-border-color);
   border-radius: 6px;
-  overflow: hidden;
 }
 </style>
